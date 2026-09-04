@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Generated outputs (reports, extracted map/firmware data, built ATLAS files)
+out/
+*.log
+
+# Map, firmware and archive payloads are never committed
+*.ATLAS
+*.atlas
+*.psf
+*.cff
+*.tsf
+*.db
+*.img
+*.ifs
+*.raw
+*.7z
+*.zip
+*.bin
+*.sig
+*.pkg
+*.geojson
+*.ndjson
+*.jsonl
+
+# Ghidra projects and headless scratch
+*.gpr
+*.rep/
+*.lock
+ghidra_proj*/
+ghidra_user*/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

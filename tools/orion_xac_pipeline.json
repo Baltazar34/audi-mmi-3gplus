@@ -1,0 +1,144 @@
+[
+  {
+    "name": "vector-record-profile",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_record_profile.py",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_record_profile/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "vector-spacing-profile",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_spacing_profile.py",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_spacing_profile/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "vector-record-layout",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_record_layout.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_record_layout/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "vector-cursor-validation",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_cursor_validate.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_cursor_validate/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "type-table-profile",
+    "command": [
+      "python3",
+      "tools/orion_xac_type_table_profile.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_type_table_profile/report.json"
+    ]
+  },
+  {
+    "name": "vector-payload-probe",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_payload_probe.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_payload_probe/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "payload-layout-infer",
+    "command": [
+      "python3",
+      "tools/orion_xac_payload_layout_infer.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_payload_layout_infer/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "vector-branch-profile",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_branch_profile.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_branch_profile/report.json",
+      "--jobs",
+      "8"
+    ]
+  },
+  {
+    "name": "vector-branch-select",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_branch_select.py",
+      "--input",
+      "out/orion_xac_vector_branch_profile/report.json",
+      "--output",
+      "out/orion_xac_vector_branch_select/report.json",
+      "--min-count",
+      "100"
+    ]
+  },
+  {
+    "name": "vector-name-refs",
+    "command": [
+      "python3",
+      "tools/orion_xac_vector_name_refs.py",
+      "--firmware",
+      "$NAVCORE_ELF",
+      "--selected",
+      "out/orion_xac_vector_offset_resolution/selected_item_targets.jsonl",
+      "--output",
+      "out/orion_xac_vector_name_refs/report.json",
+      "--jobs",
+      "8"
+    ]
+  }
+]

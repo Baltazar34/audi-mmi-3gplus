@@ -1,0 +1,152 @@
+[
+ {
+  "name": "atlas-header",
+  "command": [
+   "python3",
+   "tools/orion_atlas_header_decode.py",
+   "$MMI3G_PKGDB",
+   "--output",
+   "out/orion_atlas_header_decode"
+  ],
+  "report": "out/orion_atlas_header_decode/report.json",
+  "gate": "len(report['failures']) == 0 and len(report['databases']) == 4"
+ },
+ {
+  "name": "block-grammar-psd3",
+  "command": [
+   "python3",
+   "tools/orion_block_grammar_verify.py",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_block_grammar_verify"
+  ],
+  "report": "out/orion_block_grammar_verify/report.json",
+  "gate": "report['not_explained'] == 0 and report['file_coverage'] == 1.0"
+ },
+ {
+  "name": "index-psd",
+  "depends_on": [
+   "atlas-header"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_index_decode.py",
+   "$MMI3G_PKGDB/PSD/APN221EU22093P1664a.5_1.0.ATLAS",
+   "$MMI3G_PKGDB/PSD2/APN221EU22093P1664a.5_1.1.ATLAS",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_index_decode_PSD"
+  ],
+  "report": "out/orion_index_decode_PSD/report.json",
+  "gate": "report['failure_count'] == 0 and report['checks']['kljuc == zaglavlje sledeceg bloka'] == report['checks']['stavki']"
+ },
+ {
+  "name": "index-root-psd",
+  "depends_on": [
+   "index-psd"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_index_root_decode.py",
+   "$MMI3G_PKGDB/PSD/APN221EU22093P1664a.5_1.0.ATLAS",
+   "$MMI3G_PKGDB/PSD2/APN221EU22093P1664a.5_1.1.ATLAS",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_index_root_decode_PSD"
+  ],
+  "report": "out/orion_index_root_decode_PSD/report.json",
+  "gate": "report['root_checks']['root_sep_equals_header_of_first_block_of_next_leaf'] == report['root_checks']['root_sep_expected'] and report['root_checks']['root_offsets_equal_leaf_offsets'] == report['root_checks']['leaf_count'] and report['revision_u32_0x20_equals_root_offset']"
+ },
+ {
+  "name": "block-roundtrip-psd3",
+  "depends_on": [
+   "block-grammar-psd3"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_block_writer.py",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_block_writer_psd3"
+  ],
+  "report": "out/orion_block_writer_psd3/report.json",
+  "gate": "report['checks']['struktura bajt-identicna'] == report['checks']['blokova'] and report['checks']['codec semanticki round-trip'] == report['checks']['blokova']",
+  "on_fail": "lzma-failure-probe"
+ },
+ {
+  "name": "lzma-failure-probe",
+  "manual": true,
+  "command": [
+   "python3",
+   "tools/orion_lzma_failure_probe.py",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_lzma_failure_probe_psd3"
+  ],
+  "report": "out/orion_lzma_failure_probe_psd3/report.json",
+  "gate": "'neresen' not in report['verdicts']"
+ },
+ {
+  "name": "block-key-spatial-psd3",
+  "depends_on": [
+   "block-grammar-psd3"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_block_key_spatial_probe.py",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_block_key_spatial_probe_psd3"
+  ],
+  "report": "out/orion_block_key_spatial_probe_psd3/report.json",
+  "gate": "report['K_strictly_increasing_in_file_order'] and report['graph_blocks'] >= 7000"
+ },
+ {
+  "name": "tile-grid-psd3",
+  "depends_on": [
+   "block-key-spatial-psd3"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_tile_grid_probe.py",
+   "out/orion_block_key_spatial_probe_psd3/graph_blocks.jsonl",
+   "--output",
+   "out/orion_tile_grid_probe_psd3"
+  ],
+  "report": "out/orion_tile_grid_probe_psd3/report.json",
+  "gate": "report['quad_path_tested'] > 0"
+ },
+ {
+  "name": "tile-formula-psd3",
+  "depends_on": [
+   "block-key-spatial-psd3"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_tile_formula_verify.py",
+   "out/orion_block_key_spatial_probe_psd3/graph_blocks.jsonl",
+   "--output",
+   "out/orion_tile_formula_verify_psd3"
+  ],
+  "report": "out/orion_tile_formula_verify_psd3/report.json",
+  "gate": "report['exact'] and report['offsets_match_constants']"
+ },
+ {
+  "name": "atlas-roundtrip-psd",
+  "depends_on": [
+   "index-root-psd",
+   "block-roundtrip-psd3"
+  ],
+  "command": [
+   "python3",
+   "tools/orion_atlas_assemble.py",
+   "$MMI3G_PKGDB/PSD/APN221EU22093P1664a.5_1.0.ATLAS",
+   "$MMI3G_PKGDB/PSD2/APN221EU22093P1664a.5_1.1.ATLAS",
+   "$MMI3G_PKGDB/PSD3/APN221EU22093P1664a.5_1.2.ATLAS",
+   "--output",
+   "out/orion_atlas_assemble_roundtrip_PSD"
+  ],
+  "report": "out/orion_atlas_assemble_roundtrip_PSD/report.json",
+  "gate": "report['exact'] and report['mismatch_count'] == 0"
+ }
+]
