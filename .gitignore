@@ -9,6 +9,7 @@ out/
 *.log
 
 # Map, firmware and archive payloads are never committed
+backups/
 *.ATLAS
 *.atlas
 *.psf

@@ -79,3 +79,29 @@ name reference, i most `AtlasId → XacVectorOffset → record`. Vidi
 sadržaj je čitljiv istim dokazanim alatima. Puni semantički writer za svaki
 sloj (kao za PSD) je zaseban obiman posao po sloju; format je identifikovan,
 dekodiranje dokazano. Prihvatanje na uredjaju zahteva izdavacev potpis paketa.
+
+## FLDB container writer — 2026-09-04
+
+`tools/fldb_container.py` je zajednički čitač/round-trip/writer za sve tri
+FLDB-porodice (XAC, LIT, TMC). Dokazano **bajt-identičnim round-trip-om** na
+originalu (memorijski bezbedno, mmap):
+
+| Fajl | Stavki | byte_identical | unowned |
+|---|---|---|---|
+| XAC `kN221EUx01_0.db` (2,14 GB) | 3978 | da | 9,11 % |
+| XAC2 | 3384 | da | 0,28 % |
+| XAC3 | 418 | da | 1,01 % |
+| LIT | 1 | da | 100 % (sav sadržaj je jedan ugnežđen `.LIT`) |
+| TMC | 15 | da | 7,0 % |
+
+Directory (ime[24] + crc32 + offset + size, 36 B) se regeneriše bajt-identično.
+Otvoreno pre pisanja NOVOG sadržaja (nije forging — pošten opis našeg sadržaja):
+1. **FLDB direktorijumsko 4. polje NIJE checksum sadržaja.** Dokazano: dve `.poi`
+   različite veličine/sadržaja imaju isti tag, dva `.ort` iste veličine različit;
+   nijedna CRC-32 varijanta (zlib/bzip2/mpeg2/posix/jam/crc32c/raw) ni nad
+   sadržajem ni nad prefiksom se ne poklapa. Konstantno je po `.poi`/`.plz`,
+   varira po `.ort`. Semantika se čita **iz firmvera (FLDB reader u Ghidri)**,
+   ne pogađa se — to je sledeći korak pre XAC writer-a.
+2. **„Unowned" regioni** (9 % XAC-a = VEKTORBLOCK/continuation zona koju direktorijum
+   ne opisuje) — writer mora da ih reprodukuje iz MIB POI izvora.
+3. Generisanje unutrašnjih `.poi/.xac/.ras` iz MIB `Landmark`+`GlobalPOIIndices`.

@@ -10,6 +10,8 @@ takes a MIB map dataset and produces a structurally valid MMI 3G Plus
 `.ATLAS` routing database. Everything was done on a Mac, on copies of files.
 The car was never touched.
 
+**Continuing the work?** Start at [docs/STATUS.md](docs/STATUS.md).
+
 Serbian version of this page: [README.sr.md](README.sr.md). Most of the
 detailed documentation in `docs/` is in Serbian; the entry points and the
 tool index are in English.
